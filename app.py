@@ -35,12 +35,12 @@ with tab2:
         case "Simple":
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.image(os.path.join(os.getcwd(), "app/static", "img.jpeg"))
+                st.image("static/img.jpeg")
                 st.write("A chambre with a jacozzi")
         case "Double":
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.image(os.path.join(os.getcwd(), "app/static", "img.jpeg"))
+                st.image("static/img.jpeg")
                 st.write("A  simple double chambre")
         
 
