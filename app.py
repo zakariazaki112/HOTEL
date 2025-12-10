@@ -12,7 +12,7 @@ tab1, tab2 = st.tabs(["Agences", "Chambers"])
 
 with tab1:
     st.title("Available agencies")
-    st.image(os.path.join(os.getcwd(), "app/static", "img.jpeg"))
+    st.image("static/img.jpeg")
     col1 ,col2, col3= st.columns(3)
 
     with col1:
