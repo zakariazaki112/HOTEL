@@ -4,7 +4,7 @@ import pathlib
 from connect import *
 
 #This is the landing page
-
+#This is a test
 tables = {'CHAMBRE' : 0, 'AGENCE': 0}
 with engine.connect() as conn:
     for (tab, val) in tables.items() :
