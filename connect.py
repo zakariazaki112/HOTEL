@@ -1,10 +1,10 @@
 
 from sqlalchemy import create_engine, text
 
-dialect = 'mysql'
+dialect = 'mysql+pymysql'
 username = 'root'
 password = 'Thi$i$myp4ss'
-host = "127.0.0.1"
+host = "host.docker.internal"
 dbname = 'HOTEL'
 
 chamber_count = 0;

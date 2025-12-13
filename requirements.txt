@@ -1,15 +1,4 @@
-# Core Data Science and Web App Libraries
-streamlit==1.29.0
-sqlalchemy==2.0.23
-pandas==2.1.4
-
-# Database Connectors (Choose based on your database)
-# SQLite (built-in, no additional package needed)
-# PostgreSQL
-psycopg2-binary==2.9.9
-# MySQL
-# mysqlclient==2.2.0
-
-# Optional but Recommended Extras
-numpy==1.26.2
-matplotlib==3.8.2
+streamlit
+sqlalchemy
+mysql-connector-python
+pandas

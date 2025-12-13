@@ -1,8 +1,9 @@
-
-FROM ubuntu:latest
-
+FROM python
 WORKDIR /app
 COPY . /app
-RUN apt-get update -y && apt-get install -y pip
-RUN pip install streamlit
-RUN streamlit run Accueil.py
+RUN echo "Hello"
+RUN apt install python3 git
+RUN pip install streamlit sqlalchemy mysql-connector-python pandas MySQL
+RUN git clone https://github.com/zakariazaki112/HOTEL.git
+EXPOSE 8501
+CMD ["streamlit", "run", "Accueil.py", "--server.port=8501", "--server.address=0.0.0.0"]
