@@ -13,14 +13,12 @@ with engine.connect() as conn:
 
 
 # st.set_page_config(
+#     page_title="Hotel dashboard",
 #     layout="wide"
 # )
 
 
-with st.container(border=False, width="stretch", horizontal=True, horizontal_alignment="right"):
-    st.html("<h1 id='main-title'>Hotel</h1>")   
-    st.image(os.path.join(os.getcwd(), "static", "img.jpeg"))
-
+st.title("Hotel")
 
 st.subheader("A humble hotel situated on the outskirts of nowhere")
 Agen, Cham, Users = st.columns(3)

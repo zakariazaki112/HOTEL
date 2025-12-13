@@ -53,4 +53,3 @@ with st.form(key="res"):
                         st.success("Your reservation has been submited successfully")
                     else:
                         st.warning("Sorry, no rooms are available right now")
-                
