@@ -5,6 +5,7 @@ from connect import *
 
 
 #This is a new comment
+#This is a second comment
 #Function to check if a room is reserved
 def is_reserved(chambre):
     reserv = pd.read_sql_query("SELECT CHCODE FROM CHAMBRE WHERE CHCODE IN (SELECT CHCODE FROM RESERVER)", con=engine)
