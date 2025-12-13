@@ -1,6 +1,9 @@
-FROM python:3.9-slim
-
+FROM python
 WORKDIR /app
 COPY . /app
-RUN pip install -r requirements.txt
-CMD 'streamlit run /home/aira/Projects/TP/Base/Final_Project/app/Accueil.py'
+RUN echo "Hello"
+RUN apt install python3 git
+RUN pip install streamlit sqlalchemy mysql-connector-python pandas MySQL
+RUN git clone https://github.com/zakariazaki112/HOTEL.git
+EXPOSE 8501
+CMD ["streamlit", "run", "Accueil.py", "--server.port=8501", "--server.address=0.0.0.0"]
