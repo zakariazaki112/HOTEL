@@ -1,6 +1,8 @@
-FROM ubuntu:22.04
+
+FROM ubuntu:latest
 
 WORKDIR /app
 COPY . /app
-RUN pip install -r requirements.txt
-CMD ['streamlit', 'run', 'Accueil.py']
+RUN apt-get update -y && apt-get install -y pip
+RUN pip install streamlit
+RUN streamlit run Accueil.py
