@@ -1,45 +1,32 @@
 import streamlit as st
-import os
-import pathlib
 from connect import *
 
 #This is the landing page
 #This is a test comment
 tables = {'CHAMBRE' : 0, 'AGENCE': 0}
-with engine.connect() as conn:
-    for (tab, val) in tables.items() :
-        sql=text(f'SELECT * FROM {tab}')
-        results = conn.execute(sql)
-        for res in results:
-            tables[tab]+= 1
+for (tab, val) in tables.items() :
+    count = pd.read_sql_query(f'SELECT COUNT(*) AS TOTAL FROM {tab}', con=engine)
+    tables[tab] = count['TOTAL'][0]
 
 
-# st.set_page_config(
-#     page_title="Hotel dashboard",
-#     layout="wide"
-# )
+st.set_page_config(
+    page_title="Hotel dashboard",
+    layout="wide"
+)
 
+st.status("The status", state="error")
 
-st.title("Hotel")
+st.markdown("# Hotel Dashboard ")
+Agen, Cham = st.columns(2)
 
-st.subheader("A humble hotel situated on the outskirts of nowhere")
-Agen, Cham, Users = st.columns(3)
-
-with st.container(border=False, key="metrics"):
+with st.container(border=False):
     with Agen:
-        with st.container(border=False):
-            st.header("Agences")
-            st.subheader(tables['AGENCE'])
+        with st.container(border=True):
+            st.title("Agences")
+            st.header(tables['AGENCE'])
     with Cham:
-        with st.container(border=False):
-            st.header("Chambers")
-            st.subheader(tables["CHAMBRE"])
-    with Users:
-        with st.container(border=False):
-            st.header("Users")
-            st.subheader(user_count)
+        with st.container(border=True):
+            st.title("Chambers")
+            st.header(tables["CHAMBRE"])
 st.header("Made by : ")
 st.markdown("* Test1\n* Test2\n* Test3\n* Test4\n* Test5\n* Test6")
-
-
-conn.close()
