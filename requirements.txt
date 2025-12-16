@@ -2,3 +2,6 @@ pandas
 sqlalchemy
 matplotlib
 streamlit
+pysql
+mysqlclient
+mysql-connector-python
