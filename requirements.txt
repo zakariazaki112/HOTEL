@@ -2,7 +2,7 @@ pandas
 sqlalchemy
 matplotlib
 streamlit
-pysql
+pymysql
 mysqlclient
 MySQL-python
 
