@@ -1,10 +1,9 @@
-import streamlit as st
 from connect import *
 import calendar
 import matplotlib.pyplot as plt
 # ================== CONFIG ==================
 st.set_page_config(
-    page_title="📅 Réservations",
+    page_title="Réservations",
     page_icon="📅",
     layout="wide"
 )

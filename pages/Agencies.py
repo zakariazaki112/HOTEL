@@ -1,9 +1,8 @@
-import streamlit as st
 from connect import *
 
 # ================== CONFIG ==================
 st.set_page_config(
-    page_title="📍 Agences",
+    page_title="Agences",
     page_icon="📍",
     layout="wide"
 )
@@ -104,7 +103,8 @@ try:
 
     st.dataframe(df, use_container_width=True)
 
-except:
+except Exception as e:
+    st.error(e)
     st.warning("Impossible de charger les données")
 
 st.divider()

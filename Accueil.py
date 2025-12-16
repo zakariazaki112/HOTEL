@@ -4,7 +4,7 @@ import pandas as pd
 
 # ================== CONFIG ==================
 st.set_page_config(
-    page_title="🏨 Hôtel Management System",
+    page_title="Hôtel Management System",
     page_icon="🏨",
     layout="wide"
 )
@@ -80,14 +80,6 @@ footer {
     visibility: hidden;
 }
 
-.booked {
-    background-color: crimson;
-    border-radius: 20px;
-    text-align:center;
-    padding:0;
-    width: fit-content;
-    font-size:2vh
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -119,23 +111,22 @@ st.subheader("🖼️ Expérience & Confort")
 tabs = st.tabs(["🛏️ Chambre Simple", "👫 Chambre Double", "👑 Suite de Luxe"])
 
 with tabs[0]:
-    st.image(
-        "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200",
-        use_column_width=True,
+    st.image("https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200",
+        
         caption="Chambre simple – confort et élégance"
     )
 
 with tabs[1]:
     st.image(
         "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200",
-        use_column_width=True,
+        
         caption="Chambre double – idéale pour les couples"
     )
 
 with tabs[2]:
     st.image(
         "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200",
-        use_column_width=True,
+        
         caption="Suite de luxe – espace et raffinement"
     )
 
@@ -206,16 +197,6 @@ with st.sidebar:
 - 🛏️ Chambres  
 - 📅 Réservations  
 """)
-
-    st.divider()
-
-    if st.button("🔌 Tester la connexion", use_container_width=True):
-        try:
-            pd.read_sql_query("SHOW TABLES")
-            st.success("✅ Connexion réussie")
-        except Exception as e:
-            st.error("❌ Erreur de connexion")
-            st.code(str(e))
 
     st.divider()
     st.caption("🏨 Hôtel Management System • 2024")
