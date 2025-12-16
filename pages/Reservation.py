@@ -1,77 +1,136 @@
 import streamlit as st
 from connect import *
+import calendar
+import matplotlib.pyplot as plt
+# ================== CONFIG ==================
+st.set_page_config(
+    page_title="📅 Réservations",
+    page_icon="📅",
+    layout="wide"
+)
 
-
-st.title("Reservations")
-donnee = {
-    "Nom" : None,
-    "Prenom" : None,
-    "Email" : None,
-    "Type" : None,
-    "Date_D" : None,
-    "Date_F" : None,
-    "Espace" : None,
-    "Equipment" : None,
-    "Agence" : None
+# ================== STYLE ==================
+st.markdown("""
+<style>
+[data-testid="stAppViewContainer"] {
+    background: #0e1117;
+    }
+h1, h2, h3 {
+    color: white;
+    font-weight: 800;
 }
+div[data-testid="metric-container"] { 
+    background: linear-gradient(135deg, #FFFFFF, #E8F5E9);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+</style>
+""", unsafe_allow_html=True)
 
-def print_info(inf):
-    for (k, v)in inf.items():
-        st.write(f"{k} : {v}")
+# ================== HERO ==================
+st.title("📅 Gestion des Réservations")
+st.divider()
 
-def check_data(conn, total_equi, total_esp=0):
-    if total_equi == 0:
-        query = f"SELECT CHCODE FROM CHAMBRE WHERE CHCODE LIKE '{donnee['Type'][0]}%%' AND CHCODE NOT IN (SELECT CHCODE FROM RESERVER)"
+# ================== METRICS ==================
+col1, col2, col3 = st.columns(3)
+
+try:
+    total = query("SELECT COUNT(*) FROM BOOKING").iloc[0, 0]
+    revenu = query("SELECT SUM(Cost) FROM BOOKING").iloc[0, 0]
+    prix_moy = query("SELECT AVG(Cost) FROM BOOKING").iloc[0, 0]
+
+    chambre_pop = query("""
+        SELECT ROOM_CodR, COUNT(*) as nb_reservations
+        FROM BOOKING 
+        GROUP BY ROOM_CodR 
+        ORDER BY nb_reservations DESC 
+        LIMIT 1
+    """)
+
+    chambre_top = chambre_pop.iloc[0, 0] if not chambre_pop.empty else "N/A"
+
+except Exception as e:
+    print(e)
+    total = revenu = prix_moy = 0
+    chambre_top = "N/A"
+
+col1.metric("📅 Réservations", total)
+col2.metric("💰 Revenu total", f"{revenu:,.0f} €" if revenu else "0 €")
+col3.metric("👑 Chambre populaire", chambre_top)
+
+st.divider()
+
+# ================== ANALYSE MENSUELLE ==================
+st.subheader("📊 Analyse par mois")
+
+try:
+    monthly = query("""
+        SELECT 
+            MONTH(StartDate) as Mois,
+            COUNT(*) as `Nombre de réservations`,
+            SUM(Cost) as `Revenu total`,
+            AVG(Cost) as `Prix moyen`
+        FROM BOOKING
+        GROUP BY MONTH(StartDate)
+        ORDER BY Mois
+    """)
+
+    if not monthly.empty:
+        st.dataframe(monthly, use_container_width=True)
+
+        # Graphique
+        st.subheader("📈 Évolution des réservations")
+        st.line_chart(monthly.set_index('Mois')['Nombre de réservations'])
     else:
-        query = f"SELECT CH.CHCODE FROM CHAMBRE CH JOIN HAS_EQUIPMENTS EQ ON CH.CHCODE = EQ.CHCODE WHERE CH.CHCODE LIKE '{donnee['Type'][0]}%%' AND CH.CHCODE NOT IN (SELECT CHCODE FROM RESERVER) AND EQUIP IN {ret_tuple(donnee['Equipment'])} GROUP BY CH.CHCODE HAVING COUNT(DISTINCT EQUIP) = {total_equi}"
-        
-    if donnee["Type"] == "Suite":
-        if total_equi == 0 and total_esp == 0:
-            query = f"SELECT DISTINCT CHCODE FROM CHAMBRE WHERE CHCODE LIKE 'V%%' AND CHCODE NOT IN (SELECT CHCODE FROM RESERVER) AND CHCODE NOT IN (SELECT CHCODE FROM HAS_EQUIPMENTS) AND CHCODE NOT IN (SELECT CHCODE FROM HAS_ESPACES)"
-        elif total_equi == 0:
-            query = f"SELECT CH.CHCODE FROM CHAMBRE CH JOIN HAS_ESPACES ES ON CH.CHCODE = ES.CHCODE WHERE CH.CHCODE LIKE 'V%%' AND CH.CHCODE NOT IN (SELECT CHCODE FROM RESERVER) AND CH.CHCODE NOT IN (SELECT CHCODE FROM HAS_EQUIPMENTS) AND ESPACE IN {ret_tuple(donnee['Espace'])} GROUP BY CH.CHCODE HAVING COUNT(DISTINCT ESPACE) = {total_esp}"
-        elif total_esp == 0:
-            query = f"SELECT CH.CHCODE FROM CHAMBRE CH JOIN HAS_EQUIPMENTS EQ ON CH.CHCODE = EQ.CHCODE WHERE CH.CHCODE LIKE 'V%%' AND CH.CHCODE NOT IN (SELECT CHCODE FROM RESERVER) AND CH.CHCODE NOT IN (SELECT CHCODE FROM HAS_ESPACES) AND EQUIP IN {ret_tuple(donnee['Equipment'])} GROUP BY CH.CHCODE HAVING COUNT(DISTINCT EQUIP) = {total_equi}"
-        else:
-            query = f"SELECT CH.CHCODE FROM CHAMBRE CH JOIN HAS_EQUIPMENTS EQ ON CH.CHCODE = EQ.CHCODE JOIN HAS_ESPACES ES ON ES.CHCODE = EQ.CHCODE WHERE CH.CHCODE LIKE 'V%%' AND CH.CHCODE NOT IN (SELECT CHCODE FROM RESERVER) AND EQUIP IN {ret_tuple(donnee['Equipment'])} AND ESPACE IN {ret_tuple(donnee['Espace'])} GROUP BY CH.CHCODE HAVING COUNT(DISTINCT EQUIP) = {total_equi} AND COUNT(DISTINCT ESPACE) = {total_esp}"
-    exists = pd.read_sql_query(query, con=conn)
-    return exists
+        st.info("Aucune donnée mensuelle disponible")
+
+except Exception as e:
+    st.warning("Impossible de charger l'analyse mensuelle")
+
+# ================== DERNIÈRES RÉSERVATIONS ==================
+st.divider()
+st.subheader("📋 Dernières réservations")
+recent = 0
+try:
+    recent = query("""
+        SELECT 
+            B.ROOM_CodR as Chambre,
+            B.StartDate as Début,
+            B.EndDate as Fin,
+            B.Cost as `Prix (€)`,
+            A.CodA as Agence,
+            A.City_Address as `Ville agence`
+        FROM BOOKING B
+        JOIN TRAVEL_AGENCY A ON B.TRAVEL_AGENCY_CodA = A.CodA
+        ORDER BY B.StartDate DESC
+        LIMIT 10
+    """)
+
+    if not recent.empty:
+        st.dataframe(recent, use_container_width=True)
+    else:
+        st.info("Aucune réservation récente")
+
+except Exception as e:
+    st.warning("Impossible de charger les réservations")
+
+st.divider()
+st.caption("📅 Module Réservations • Base: hotel")
+
+st.dataframe(recent, use_container_width=True)
 
 
-        
-donnee["Type"] = st.selectbox("Type", ['Simple', 'Double', 'Triple', 'Suite'])
+query = pd.read_sql_query(
+    f"SELECT R.CodR, R.Floor, R.SurfaceArea, R.Type, MONTH(B.StartDate) AS month, B.Cost FROM ROOM R JOIN BOOKING B ON R.CodR = B.ROOM_CodR", con=engine)
+res = query.groupby("month")["Cost"].sum().sort_values(ascending=False)
+res.index = [calendar.month_name[i] for i in res.index]
 
-with st.form(key="res"):
-    donnee["Nom"] = st.text_input(label="Nom")
-    donnee["Prenom"] = st.text_input(label="Prenom")
-    donnee["Email"] = st.text_input(label="Email")
-    agences = pd.read_sql_query("SELECT DISTINCT NOM FROM AGENCE", con=engine)
-    donnee["Agence"] = st.selectbox("Agences", agences)
-    donnee["Equipment"] = st.multiselect("Equipments", ['Jacuzzi', 'Minibar', 'Balcon'])
-    if donnee['Type'] == "Suite":
-        donnee["Espace"] = st.multiselect("Espaces", ["Chamber", "Salle a manger", "Salon"])
-    
-    donnee["Date_D"] = st.date_input(label="Date de Debut")
-    donnee["Date_F"] = st.date_input(label="Date Final")
-    
-    sub = st.form_submit_button(label="Reserver")
-    if sub:
-        if donnee["Date_D"] == donnee["Date_F"]:
-            st.warning("Start and Final Dates can't be the same")
-        elif donnee["Date_D"] > donnee["Date_F"]:
-            st.warning("Trying to go back to the past now are we?")
-        else:
-            with engine.connect() as conn:
-                try:
-                     data = check_data(conn, len(donnee["Equipment"]), len(donnee["Espace"]))
-                except:
-                    data = check_data(conn, len(donnee["Equipment"]))
-                    available_ID = 0
-                    if not data.empty:
-                        available_ID = data['CHCODE'][0]
-                        agency_id = pd.read_sql_query(f"SELECT ACODE FROM AGENCE WHERE NOM LIKE '{donnee['Agence']}'", con=engine)['ACODE'][0]
-                        conn.execute(text(f"INSERT INTO RESERVER(CHCODE, DATE_DEBUT, DATE_END, PRIX, AGENCE) VALUES('{available_ID}', '{donnee['Date_D']}' ,'{donnee['Date_F']}', 999, '{agency_id}')"))
-                        conn.commit()
-                        st.success(f"Your reservation has been submited successfully, The room ID is : {available_ID}")
-                    else:
-                        st.warning("Sorry, no rooms are available right now")
+
+st.dataframe(res, use_container_width=True)
+st.divider()
+st.line_chart(res)
+
+booking_price = pd.read_sql_query(
+    "SELECT * FROM BOOKING", con=engine).groupby("ROOM_CodR")['Cost'].sum()
+st.dataframe(booking_price, use_container_width=True)

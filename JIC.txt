@@ -1,0 +1,73 @@
+# st.title("Reservations")
+# donnee = {
+#     "Nom" : None,
+#     "Prenom" : None,
+#     "Email" : None,
+#     "Type" : None,
+#     "Date_D" : None,
+#     "Date_F" : None,
+#     "Espace" : None,
+#     "Equipments" : None,
+#     "TRAVEL_AGENCY" : None
+# }
+
+# def print_info(inf):
+#     for (k, v)in inf.items():
+#         st.write(f"{k} : {v}")
+
+# def check_data(conn, total_equi, total_esp=0):
+#     if total_equi == 0:
+#         query = f"SELECT CodR FROM ROOM WHERE CodR LIKE '{donnee['Type'][0]}%%' AND CodR NOT IN (SELECT CodR FROM BOOKING)"
+#     else:
+#         query = f"SELECT CH.CodR FROM ROOM CH JOIN HAS_AMENITIES EQ ON CH.CodR = EQ.ROOM_CodR WHERE CH.Type LIKE '{donnee['Type'].lower()}' AND CH.CodR NOT IN (SELECT ROOM_CodR FROM BOOKING) AND AMENITIES_Amenity IN {ret_tuple(donnee['Equipments'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT AMENITIES_Amenity) = {total_equi}"
+        
+#     if donnee["Type"] == "Suite":
+#         if total_equi == 0 and total_esp == 0:
+#             query = f"SELECT DISTINCT CodR FROM ROOM WHERE Type = 'suite' AND CodR NOT IN (SELECT ROOM_CodR FROM BOOKING) AND CodR NOT IN (SELECT ROOM_CodR FROM HAS_AMENITIES) AND CodR NOT IN (SELECT ROOM_CodR FROM HAS_SPACES)"
+#         elif total_equi == 0:
+#             query = f"SELECT CH.CodR FROM ROOM CH JOIN HAS_SPACES ES ON CH.CodR = ES.ROOM_CodR WHERE Type = 'suite' AND CH.CodR NOT IN (SELECT ROOM_CodR FROM BOOKING) AND CH.CodR NOT IN (SELECT ROOM_CodR FROM HAS_AMENITIES) AND SPACES_Space IN {ret_tuple(donnee['Espace'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT SPACES_Space) = {total_esp}"
+#         elif total_esp == 0:
+#             query = f"SELECT CH.CodR FROM ROOM CH JOIN HAS_AMENITIES EQ ON CH.CodR = EQ.CodR WHERE CH.CodR LIKE 'V%%' AND CH.CodR NOT IN (SELECT CodR FROM BOOKING) AND CH.CodR NOT IN (SELECT CodR FROM HAS_SPACES) AND AMENITIES_Amenity IN {ret_tuple(donnee['AMENITIES_Amenityment'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT AMENITIES_Amenity) = {total_equi}"
+#         else:
+#             query = f"SELECT CH.CodR FROM ROOM CH JOIN HAS_AMENITIES EQ ON CH.CodR = EQ.CodR JOIN HAS_SPACES ES ON ES.CodR = EQ.CodR WHERE CH.CodR LIKE 'V%%' AND CH.CodR NOT IN (SELECT CodR FROM BOOKING) AND AMENITIES_Amenity IN {ret_tuple(donnee['AMENITIES_Amenityment'])} AND SPACES_Space IN {ret_tuple(donnee['SPACES_Space'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT AMENITIES_Amenity) = {total_equi} AND COUNT(DISTINCT SPACES_Space) = {total_esp}"
+#     exists = pd.read_sql_query(query, con=conn)
+#     return exists
+
+
+        
+# donnee["Type"] = st.selectbox("Type", ['Simple', 'Double', 'Triple', 'Suite'])
+
+# with st.form(key="res"):
+#     donnee["Nom"] = st.text_input(label="Nom")
+#     donnee["Prenom"] = st.text_input(label="Prenom")
+#     donnee["Email"] = st.text_input(label="Email")
+#     TRAVEL_AGENCYs = pd.read_sql_query("SELECT DISTINCT NOM FROM TRAVEL_AGENCY", con=engine)
+#     donnee["Agence"] = st.selectbox("AGENCY", TRAVEL_AGENCYs)
+#     donnee['Equipments'] = st.multiselect("Equipments", ['Jacuzzi', 'Minibar', 'Balcon'])
+#     if donnee['Type'] == "Suite":
+#         donnee["SPACES_Space"] = st.multiselect("Spaces", ["Chamber", "Salle a manger", "Salon"])
+    
+#     donnee["Date_D"] = st.date_input(label="Date de Debut")
+#     donnee["Date_F"] = st.date_input(label="Date Final")
+    
+#     sub = st.form_submit_button(label="BOOKING")
+#     if sub:
+#         if donnee["Date_D"] == donnee["Date_F"]:
+#             st.warning("Start and Final Dates can't be the same")
+#         elif donnee["Date_D"] > donnee["Date_F"]:
+#             st.warning("Trying to go back to the past now are we?")
+#         else:
+#             with engine.connect() as conn:
+#                 try:
+#                      data = check_data(conn, len(donnee['Equipments']), len(donnee["SPACES_Space"]))
+#                 except:
+#                     data = check_data(conn, len(donnee['Equipments']))
+#                     available_ID = 0
+#                     if not data.empty:
+#                         available_ID = data['CodR'][0]
+#                         agency_id = pd.read_sql_query(f"SELECT CodA FROM TRAVEL_AGENCY WHERE NOM LIKE '{donnee['Agence']}'", con=engine)['CodA'][0]
+#                         conn.execute(text(f"INSERT INTO BOOKING(`ROOM_CodR`, `StartDate`, `EndDate`, `Cost`, `TRAVEL_AGENCY_CodA`) VALUES('{available_ID}', '{donnee['Date_D']}' ,'{donnee['Date_F']}', 999, '{agency_id}')"))
+#                         conn.commit()
+#                         st.success(f"Your reservation has been submited successfully, The room ID is : {available_ID}")
+#                     else:
+#                         st.warning("Sorry, no rooms are available right now")

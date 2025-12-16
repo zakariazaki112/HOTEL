@@ -18,15 +18,14 @@ def ret_tuple(arr):
     output += ')'
     return output
 
-chamber_count = 0;
-agency_count = 0;
-user_count = 0;
+def query(sql):
+    return pd.read_sql(sql, con=engine)
 
 dialect = 'mysql'
 username = 'root'
 password = 'Thi$i$myp4ss'
 host = "localhost"
 #host = "host.docker.internal"
-dbname = 'HOTEL'
+dbname = 'hotel'
 
 engine = create_engine(f"{dialect}://{username}:{password}@{host}/{dbname}")
