@@ -1,9 +1,5 @@
-pandas
-sqlalchemy
-matplotlib
 streamlit
+sqlalchemy
 pymysql
 mysqlclient
-MySQL-python
-
-mysql-connector-python
+pandas
