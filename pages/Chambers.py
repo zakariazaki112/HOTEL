@@ -99,16 +99,16 @@ with st.sidebar:
             if total_equi == 0 and total_esp == 0:
                 query = f"SELECT * FROM ROOM WHERE Type = 'suite'"
             elif total_equi == 0:
-                query = f"SELECT CH.CodR FROM ROOM CH JOIN HAS_SPACES ES ON CH.CodR = ES.ROOM_CodR WHERE CH.Type = 'suite' AND CH.CodR NOT IN (SELECT ROOM_CodR FROM HAS_AMENITIES) AND SPACES_Space IN {ret_tuple(filter['espaces'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT SPACES_Space) = {total_esp}"
+                query = f"SELECT CH.CodR, CH.Floor, CH.SurfaceArea  FROM ROOM CH JOIN HAS_SPACES ES ON CH.CodR = ES.ROOM_CodR WHERE CH.Type = 'suite' AND CH.CodR NOT IN (SELECT ROOM_CodR FROM HAS_AMENITIES) AND SPACES_Space IN {ret_tuple(filter['espaces'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT SPACES_Space) = {total_esp}"
             elif total_esp == 0:
-                query = f"SELECT CH.CodR FROM ROOM CH JOIN HAS_AMENITIES EQ ON CH.CodR = EQ.CodR WHERE CH.Type = 'suite' AND CH.CodR NOT IN (SELECT ROOM_CodR FROM HAS_SPACES) AND AMENITIES_Amenity IN {ret_tuple(filter['equi'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT AMENITIES_Amenity) = {total_equi}"
+                query = f"SELECT CH.CodR, CH.Floor, CH.SurfaceArea FROM ROOM CH JOIN HAS_AMENITIES EQ ON CH.CodR = EQ.ROOM_CodR WHERE CH.Type = 'suite' AND CH.CodR NOT IN (SELECT ROOM_CodR FROM HAS_SPACES) AND AMENITIES_Amenity IN {ret_tuple(filter['equi'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT AMENITIES_Amenity) = {total_equi}"
             else:
-                query = f"SELECT CH.CodR FROM ROOM CH JOIN HAS_AMENITIES EQ ON CH.CodR = EQ.CodR JOIN HAS_SPACES ES ON ES.CodR = EQ.CodR WHERE Type = 'suite' AND AMENITIES_Amenity IN {ret_tuple(filter['equi'])} AND SPACES_Space IN {ret_tuple(filter['SPACES_Spaces'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT AMENITIES_Amenity) = {total_equi} AND COUNT(DISTINCT SPACES_Space) = {total_esp}"
+                query = f"SELECT CH.CodR, CH.Floor, CH.SurfaceArea FROM ROOM CH JOIN HAS_AMENITIES EQ ON CH.CodR = EQ.ROOM_CodR JOIN HAS_SPACES ES ON ES.CodR = EQ.CodR WHERE Type = 'suite' AND AMENITIES_Amenity IN {ret_tuple(filter['equi'])} AND SPACES_Space IN {ret_tuple(filter['SPACES_Spaces'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT AMENITIES_Amenity) = {total_equi} AND COUNT(DISTINCT SPACES_Space) = {total_esp}"
         case 'Tous':
             if total_equi == 0:
                 query = "SELECT * FROM ROOM"
             else:
-                query = f"SELECT CH.CodR FROM ROOM CH JOIN HAS_AMENITIES EQ ON CH.CodR = EQ.ROOM_CodR WHERE AMENITIES_Amenity IN {ret_tuple(filter['equi'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT AMENITIES_Amenity) = {total_equi}"
+                query = f"SELECT CH.CodR, CH.Floor, CH.SurfaceArea FROM ROOM CH JOIN HAS_AMENITIES EQ ON CH.CodR = EQ.ROOM_CodR WHERE AMENITIES_Amenity IN {ret_tuple(filter['equi'])} GROUP BY CH.CodR HAVING COUNT(DISTINCT AMENITIES_Amenity) = {total_equi}"
         case _:
             if total_equi == 0:
                 query = f"SELECT * FROM ROOM WHERE Type LIKE '{filter['type'].lower()}'"
