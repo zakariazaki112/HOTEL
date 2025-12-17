@@ -123,7 +123,6 @@ for i in Resultat['CodR']:
 Resultat['BOOKING'] = ROOM_BOOKING
 col1, col2 = st.columns(2)
 change = True
-print(Resultat)
 with st.container(border=False):
     for i in Resultat.values:
         if change:
