@@ -1,6 +1,6 @@
 #!/bin/bash
 
-k=10
+k=0
 for i in *.jpg;do
 	cp -p "$i" ./$k.jpeg
 	k=$((k+1))
