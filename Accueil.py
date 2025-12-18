@@ -94,9 +94,9 @@ st.divider()
 col1, col2, col3 = st.columns(3)
 
 try:
-    nb_agences = pd.read_sql_query("SELECT COUNT(*) total FROM AGENCE").iloc[0, 0]
-    nb_chambres = pd.read_sql_query("SELECT COUNT(*) total FROM CHAMBRE").iloc[0, 0]
-    nb_reservations = pd.read_sql_query("SELECT COUNT(*) total FROM RESERVER").iloc[0, 0]
+    nb_agences = pd.read_sql_query("SELECT COUNT(*) total FROM TRAVEL_AGENCY").iloc[0, 0]
+    nb_chambres = pd.read_sql_query("SELECT COUNT(*) total FROM ROOM").iloc[0, 0]
+    nb_reservations = pd.read_sql_query("SELECT COUNT(*) total FROM BOOKING").iloc[0, 0]
 except:
     nb_agences = nb_chambres = nb_reservations = 0
 
@@ -115,13 +115,16 @@ with tabs[0]:
     st.image("https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200",
         
         caption="Chambre simple – confort et élégance"
+        ,
+        use_column_width=True
     )
 
 with tabs[1]:
     st.image(
         "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200",
         
-        caption="Chambre double – idéale pour les couples"
+        caption="Chambre double – idéale pour les couples",
+        use_column_width=True
     )
 
 with tabs[2]:
@@ -129,6 +132,8 @@ with tabs[2]:
         "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200",
         
         caption="Suite de luxe – espace et raffinement"
+        ,
+        use_column_width=True
     )
 
 st.divider()
@@ -170,21 +175,28 @@ st.divider()
 # ================== À PROPOS ==================
 st.subheader("💼 À propos du projet")
 
-left, right = st.columns(2)
-
-with left:
-    st.info("""
+st.info("""
 🎯 **Objectif**
 
 Concevoir une application web moderne permettant la gestion complète
 des réservations d'une chaîne hôtelière à l'aide de Streamlit et MySQL.
 """)
 
-with right:
-    st.success("""
+st.success("""
 👩‍🎓 **Réalisé par**
 
-**Sophia Yassfouli**  
+**Sophia Yassfouli**
+
+**Badr Eddaoudi**
+
+**Marwa Aqrir**
+
+**Zakaria Zaki**
+
+**Ayoub Sabri**
+
+**Asma Bennani**
+
 ENSA  
 Python • Streamlit • MySQL • SQLAlchemy
 """)

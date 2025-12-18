@@ -133,3 +133,37 @@ st.line_chart(res)
 booking_price = pd.read_sql_query(
     "SELECT * FROM BOOKING", con=engine).groupby("ROOM_CodR")['Cost'].sum()
 st.dataframe(booking_price, use_container_width=True)
+
+# ================== CHAMBRE LA PLUS CHÈRE PAR MOIS ==================
+st.subheader("💸 Chambre la Plus Chère par Mois")
+
+
+monthly_cost = pd.read_sql_query("""
+    SELECT 
+        MONTH(B.StartDate) as Mois,
+        R.CodR,
+        R.Floor,
+        R.SurfaceArea,
+        R.Type,
+        AVG(B.Cost) as Cout_moy
+    FROM BOOKING B
+    JOIN ROOM R ON B.ROOM_CodR = R.CodR
+    GROUP BY MONTH(B.StartDate), R.CodR, R.Floor, R.SurfaceArea, R.Type
+""", con=engine)
+
+if not monthly_cost.empty:
+    idx = monthly_cost.groupby('Mois')['Cout_moy'].idxmax()
+    top_rooms = monthly_cost.loc[idx].sort_values('Mois')
+    st.dataframe(top_rooms[['Mois','CodR','Floor','SurfaceArea','Type','Cout_moy']], use_container_width=True)
+    
+    # Graphique du coût moyen journalier
+    st.subheader("📈 Évolution du Coût Journalier Moyen")
+    monthly_avg = monthly_cost.groupby('Mois')['Cout_moy'].mean()
+    st.line_chart(monthly_avg)
+else:
+    st.info("Aucune donnée disponible")
+    
+
+
+st.markdown("---")
+st.caption("📅 Module Réservations • Base: hotel")

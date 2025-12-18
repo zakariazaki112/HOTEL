@@ -25,5 +25,5 @@ PASS = os.getenv("DB_PASS", "Thi$i$myp4ss")
 HOST = os.getenv("DB_HOST", "localhost")
 PORT = os.getenv("DB_PORT", "3306")
 DB = os.getenv("DB_NAME", "hotel")
-engine_url = f"mysql+pymysql://{USER}:{PASS}@{HOST}:{PORT}/{DB}?charset=utf8mb4"
+engine_url = f"mysql+mysqlconnector://{USER}:{PASS}@{HOST}:{PORT}/{DB}?charset=utf8mb4"
 engine = create_engine(engine_url)
